@@ -41,7 +41,7 @@ for n in args.n_components:
 
     pca = PCA(n_components=n, svd_solver="full", whiten=False)
     train_pca = pca.fit(train_features).transform(train_features)  # fitted on train only
-    test_pca = np.ascontiguousarray(pca.transform(test_samples), dtype=np.float64)
+    test_pca = pca.transform(test_samples)
     total_variance = float(np.sum(pca.explained_variance_ratio_))
 
     header = (
@@ -52,10 +52,10 @@ for n in args.n_components:
         f"N_CLASSES: {len(np.unique(train_labels))} \n"
         "DATASET:\n"
     )
-    with open(out_dir / "train_samples.dat", "wb") as f:
-        f.write(header.encode("ascii"))
+    with open(out_dir / "train_samples.dat", "w", newline="\n") as f:
+        f.write(header)
         for row, label in zip(train_pca, train_labels):
-            f.write((" ".join(f"{value:.10f}" for value in row) + f" {label}\n").encode("ascii"))
+            f.write(" ".join(f"{value:.10f}" for value in row) + f" {label}\n")
 
     np.save(out_dir / "test_samples.npy", test_pca)
     np.save(out_dir / "test_targets.npy", test_targets)
