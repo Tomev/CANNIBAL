@@ -90,7 +90,7 @@ uv run python scripts/pca_pavia/make_pca_dataset.py \
     --n-components 10 12
 ```
 
-Each folder holds `train_samples.dat` (GAwLL format), `test_samples.npy`, `test_targets.npy`, `pca_model.npz` and `metadata.json`. An existing output folder is an error unless `--overwrite` is given.
+Each folder holds `train_samples.dat` (GAwLL format), `test_samples.npy`, `test_targets.npy`, `pca_model.npz` and `metadata.json`. Output folders are created if missing and existing files are overwritten.
 
 ### Band selection on the PCA datasets
 
