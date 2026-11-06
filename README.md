@@ -78,3 +78,16 @@ The scripts to run all of the experiments are present in "scripts" directory.
 There are modules to run experiments (`runner.py`), process results (`metrics.py`), calculate metrics (`metrics.py`) and draw different visualizations in the paper (`draw_mse.ipynb`). The specified names are only examples, analogous modules follow the same naming template to avoid confusion.
 
 The main scripts for running the hyperspectral unmixing and segmentation experiments are located in `scripts` folder and are named `runner_reg.py` and `runner.py`, respectively. Both incorporate `run` function. Those modules additionally contain load data methods and CANNIBAL-specific `get_band_indices_based_on_VIGs` methods which executed the band selection process.
+
+## PCA datasets
+
+`scripts/pca_pavia/make_pca_dataset.py` fits PCA on the training samples only and writes a PCA-reduced train and test dataset for each requested size to `<output-root>/PCA<n>-Pavia/`. The saved values are raw PCA scores (not rescaled to 0-1, may be negative). There are no default paths, and the script works from any directory.
+
+```bash
+uv run python scripts/pca_pavia/make_pca_dataset.py \
+    --source-dir "<folder with train_samples.dat, test_samples.npy, test_targets.npy>" \
+    --output-root "<output folder>" \
+    --n-components 10 12
+```
+
+Each folder holds `train_samples.dat` (GAwLL format), `test_samples.npy`, `test_targets.npy`, `pca_model.npz` and `metadata.json`. An existing output folder is an error unless `--overwrite` is given.
