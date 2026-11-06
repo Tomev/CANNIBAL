@@ -113,3 +113,25 @@ Results are written to `<results-root>/PCA<k>-Pavia/bands/`; band files hold 0-b
 * `manifest.csv` with columns `dataset,method,requested_n,returned_n,seed,status,band_file,note`. `band_file` is relative to the results root, `requested_n` is `auto` for self-counting methods, and `status` is `selected`, `trivial_all_bands`, `mi_ranking_fill` (the original `mi` search asserts for `n >= k - 2`, so the top `n` bands of its mutual-information ranking are used) or `failed`.
 
 `bombs` runs in a subprocess and is retried with the next seed (starting from 0, at most 20 attempts) if it exits with an error; `seed` records the seed used.
+
+### Segmentation metrics on the PCA datasets
+
+`scripts/pca_pavia/segmentation_metrics.py` scores every band set in the `manifest.csv` of the previous step with a random forest. It follows the protocol of `scripts/runner.py` but has no hardcoded paths. There are no default dataset paths, and the script works from any directory.
+
+```bash
+uv run python scripts/pca_pavia/segmentation_metrics.py \
+    --dataset-dir "<PCA10-Pavia folder>" "<PCA12-Pavia folder>"
+```
+
+Options: `--results-root` (default `experimental_results/pca_pavia/`; the manifests are read from there and the dataset folder name selects the subfolder). Rerunning overwrites `metrics/`.
+
+Protocol: `RandomForestClassifier(n_estimators=4, random_state=seed)` with default settings otherwise, fitted on the selected columns of `train_samples.dat` and applied to the same columns of `test_samples.npy`. Test pixels of class 0 (background) are removed, which leaves 40,641 pixels; the script stops if the count differs. Raw PCA values are used (no scaling). Metrics are the scikit-learn calls of `runner.py` with default `zero_division`: `acc`, `avg_acc` (balanced accuracy), and macro, micro and weighted `f1`, `precision` and `recall`. `time` is the number of seconds for fit, predict and metrics of one run (data loading excluded).
+
+Pairing of band sets and forest seeds: `random` has one band set per seed (0-19) and count, and band set `i` is evaluated with forest seed `i` only. Every other method has one band set per configuration, evaluated with forest seeds 0-19. Either way a configuration has 20 runs. The `seed` of `bombs` rows in the manifest is the retry seed of the selection, kept only as information. Manifest rows with status `failed` are skipped with a printed line.
+
+Results are written to `<results-root>/PCA<k>-Pavia/metrics/`, `;` separated:
+
+* `all_runs.csv`: one row per forest run. Columns `dataset;method;requested_n;returned_n;band_seed;rf_seed;status;band_file`, then the 12 metrics. `band_seed` is the manifest `seed` (empty when there is none).
+* `summary.csv`: one row per dataset, method and `requested_n`. Columns `dataset;method;requested_n;returned_n;status;n_runs`, then `<metric>_mean` and `<metric>_std` (sample standard deviation) for each metric.
+
+Rows are ordered by method (`bombs`, `mi`, `random`, `cannibal`, `affinity_prop`, `gawll_sel`), then count (`auto` first), then seeds. At `n = k` the band set is the same for every method, so `trivial_all_bands` rows agree across methods. In `all_runs.csv`, `acc` equals `precision_micro` and `recall_micro`, and `f1_micro` up to rounding (about 1e-16); `avg_acc` equals `recall_macro`.
