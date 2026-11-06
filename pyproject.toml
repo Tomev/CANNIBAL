@@ -1,0 +1,30 @@
+[project]
+name = "cannibal"
+version = "0.0.0"
+description = "CANNIBAL: hyperspectral band selection experiments (GAwLL + Python scripts)"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+# Direct runtime dependencies are pinned to the versions of the original
+# experiment environment (see requirements.txt), since library versions
+# affect published results. Transitive dependencies are recorded in uv.lock.
+dependencies = [
+    "numpy==1.24.3",
+    "pandas==2.0.3",
+    "scipy==1.11.1",
+    "scikit-learn==1.3.0",
+    "matplotlib==3.7.2",
+    "networkx==3.1",
+    "tqdm==4.65.0",
+    "pillow==9.4.0",
+    # Only used by gawll_with_hu_and_seg/draw.ipynb; not in requirements.txt.
+    "reportlab",
+]
+
+[dependency-groups]
+dev = [
+    "jupyterlab",
+    "ipykernel",
+]
+
+[tool.uv]
+package = false

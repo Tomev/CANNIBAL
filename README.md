@@ -53,6 +53,20 @@ Observation 2: gawll generates 4 main files
 
 # CANNIBAL
 
+## Setup
+
+The Python environment is managed with [uv](https://docs.astral.sh/uv/) and uses Python 3.11 (the original experiments ran on 3.11.5; see `.python-version`). Direct dependencies are pinned to the original versions, because library versions affect the results.
+
+```bash
+uv sync --locked
+```
+
+`jupyterlab` and `ipykernel` are in the `dev` dependency group and are installed by default by `uv sync`. Run scripts with `uv run python ...`.
+
+To build GAwLL (requires a C++ compiler such as `g++`/clang), run `make` inside `gawll_with_hu_and_seg/`. This produces the `gawll_fs` executable; see the GAwLL section above for how to run it.
+
+`requirements.txt` is the original Windows Anaconda export (win-64) and is kept for reference only; it is not used to create the environment.
+
 Before running experiments be sure to install all required packages. Also, please note, that GAwLL requires C++ compiler installed.
 
 The code and script for each investigated band selection algorithm is present in the `"experimental_results/<METHOD-NAME>"` folder, e.g., `"experimental_results/bombs"` or `"experimental_results/mi"`.
